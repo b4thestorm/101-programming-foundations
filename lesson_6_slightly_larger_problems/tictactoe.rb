@@ -19,7 +19,6 @@ position = nil
 WINNING_STATES = [[0,1,2],[3,4,5],[6,7,8],[0,4,8],[2,4,6]] #winning states
 BOARD_SIZE = game_board.length
 
-
 puts ' '   
 puts 'Welcome to TicTacToe ==>' 
 puts 'Let\'s mark the first square'
@@ -60,17 +59,17 @@ def congratulate_winner(win_state)
   end   
 end
 
-def descriminate(win_state, game_board)
+def determine_winner(win_state, game_board)
   choice = win_state.map {|position| game_board[position].values}
   choice = choice.flatten
   if choice.uniq.length == 1
     return choice.uniq[0]
   else 
-    return nil #bug
+    return false
   end 
 end
 
-def determine_winner(game_board)
+def check_win_state(game_board)
   count = 0
   win_state = nil
     loop do 
@@ -78,12 +77,12 @@ def determine_winner(game_board)
        loop do 
          if win_block.select {|position| game_board[position]}.count == 3  
             win_state = win_block.select {|position| game_board[position]} #perch for variable setting
-           if descriminate(win_state, game_board)
-             win_state = descriminate(win_state, game_board)
+           if determine_winner(win_state, game_board)
+             win_state = determine_winner(win_state, game_board)
              break(2)
            end 
          else
-           break 
+           break(2) 
          end
        end 
       break if count > 3
@@ -101,13 +100,33 @@ def tied_game?(game_board)
   end
 end 
 
+def player_choose_position(game_board) 
+  available = [] 
+  BOARD_SIZE.times do |x|
+     if game_board[x].nil?
+        available << x
+     end
+  end
+  print "Player choose a position: #{join_or(available)}"
+end 
 
+def join_or(available_positions)
+   last = available_positions[-1] ; available_positions[-1] = 'or'
+   available_positions.<<(last)
+   available_positions.join(", ")
+end 
+
+def player_score(player, score)
+  score << player
+end 
+
+score = []
 # Mainloop - memory used here
 
 loop do   #MAIN GAME LOOP
 
    loop do 
-      puts "===> Player choose a position from 0 - 8"
+      puts player_choose_position(game_board) # "===> Player choose a position from 0 - 8"
       position = gets.chomp      
       next 'please choose a value that is a number' if !position.respond_to?(:to_i) 
        if position_available?(position, game_board) == false
@@ -119,7 +138,7 @@ loop do   #MAIN GAME LOOP
    end
 
    show_board(game_board)
-   win_state = determine_winner(game_board)  
+   win_state = check_win_state(game_board)  
     
    if !win_state.nil? 
     puts congratulate_winner(win_state)
@@ -143,9 +162,10 @@ loop do   #MAIN GAME LOOP
 
    sleep(1)
    show_board(game_board)
-   win_state = determine_winner(game_board)
+   win_state = check_win_state(game_board)
 
    if !win_state.nil? 
+     player_score()
      puts congratulate_winner(win_state)
      break 
    end   
