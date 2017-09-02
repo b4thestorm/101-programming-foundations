@@ -1,4 +1,5 @@
 require 'pry'
+
     def calculate_hand(hand)
       #Pick the number or letter out of the hand and assign a value
       card_values = []
@@ -16,6 +17,7 @@ require 'pry'
     end
 
     def sum_with_aces(total_hand, aces)
+
       if aces.count >= 1
         sum = total_hand.inject(0) {|base, total| base + total }  
         aces.each do |_|
@@ -35,9 +37,23 @@ require 'pry'
      puts "#{who} chose to Stay"
     end
 
+    def win?(score)
+       return true if score == 21 
+    end 
+
+    def play_again? 
+      puts "Would you like to play again? (y/n)"
+      answer = gets.chomp
+        if answer == 'y' || 'Y'
+          return true
+        elsif answer == 'n' || 'N'
+          return false 
+        end 
+    end 
+
     def compare_hands(plyr1, plyr2)
-      player_total = calculate_hand(plyr1)
-      dealer_total = calculate_hand(plyr2)
+      # player_total = calculate_hand(plyr1)
+      # dealer_total = calculate_hand(plyr2)
       if player_total > dealer_total 
         return ['Player', plyr1]
       else
@@ -85,6 +101,8 @@ require 'pry'
       player_hand = []
       dealer_hand = []
       flag = []
+      # player_total = 0 #local variables can not be accessed outside of block 
+      # dealer_total = 0
 
    loop do 
       # dealer deals the hands
@@ -92,53 +110,92 @@ require 'pry'
         player_hand << DECK.pop
         dealer_hand << DECK.pop
        end 
+       player_total = 0 
+       dealer_total = 0
+
       # dealer shows it's card
       puts  "The Dealer has: #{dealer_hand[1]}" 
-     
+
         loop do 
-          puts "You have: #{player_hand} " + "total: #{calculate_hand(player_hand)}"
+          player_total = calculate_hand(player_hand)
+          puts "You have: #{player_hand} " + "total: #{player_total}"
           # choose to hit or stay
           puts "Choose one would you like to:  1) Hit or  2) Stay "
           choice = gets.chomp
           if choice.to_i == 1 
             player_hand << hit 
-            if calculate_hand(player_hand) > 21
+            player_total = calculate_hand(player_hand) 
+            if player_total > 21
               flag << 'BUST!'
              break  #break loop set flag
-            else 
-             calculate_hand(player_hand) > 21
-            end
+            end 
           elsif choice.to_i == 2
             stay('Player')
-            puts  "You have: #{calculate_hand(player_hand)}"
+            player_total = calculate_hand(player_hand) 
+            puts  "You have: #{player_total}"
             break
           end
         end
       
        if bust?(flag)
-        break puts "Dealer Wins!"
+        puts "Dealer Wins!"
+        sleep(1)
+        answer = play_again
+        if answer == true
+          next 
+        elsif answer == false 
+          break
+        end
        end
- 
+
+       if win?(player_total)
+        puts "Player Wins!"
+        answer = play_again?
+        if answer == true
+          next 
+        elsif answer == false 
+          break
+        end
+       end 
+
        loop do
-        calculate_hand(dealer_hand)
-         if calculate_hand(dealer_hand) > 17
-          if calculate_hand(dealer_hand) > 21 
+         dealer_total = calculate_hand(dealer_hand)
+         if dealer_total > 17
+          if dealer_total > 21 
             flag << 'BUST!'
             break #break loop set flag
           end       
+            dealer_total = calculate_hand(dealer_hand)
             stay('Dealer') 
             break
          elsif 
+          dealer_total = calculate_hand(dealer_hand)
           dealer_hand << hit
          end 
         end
        
        if bust?(flag)
-        break puts "Dealer Wins!"
+        puts "Player Wins!"
+        sleep(1)
+        answer = play_again?
+        if answer == true
+          next 
+        elsif answer == false 
+          break
+        end
        end
+      
+       if win?(dealer_total) 
+        puts "Dealer Wins!"
+        answer = play_again?
+        if answer == true
+          next 
+        elsif answer == false 
+          break
+        end
+       end 
 
-
-       flag << compare_hands(player_hand, dealer_hand)
+       flag << compare_hands(player_total, dealer_total)
        puts winning_message(flag)
        break 
 
