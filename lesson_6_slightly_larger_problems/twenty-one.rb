@@ -43,18 +43,16 @@ require 'pry'
 
     def play_again? 
       puts "Would you like to play again? (y/n)"
-      answer = gets.chomp
-        if answer == 'y' || 'Y'
+      answer = gets.chomp.to_sym
+        if answer == :y
           return true
-        elsif answer == 'n' || 'N'
+        elsif answer == :n
           return false 
         end 
     end 
 
     def compare_hands(plyr1, plyr2)
-      # player_total = calculate_hand(plyr1)
-      # dealer_total = calculate_hand(plyr2)
-      if player_total > dealer_total 
+      if plyr1 > plyr2
         return ['Player', plyr1]
       else
         return ['Dealer', plyr2]
@@ -64,14 +62,32 @@ require 'pry'
    def winning_message(flag)
     <<-HEREDOC
       #{flag[0][0]} wins this Game 
-      total of: #{calculate_hand(flag[0][1])}
-      hand of: #{flag[0][1]} 
+      total of: #{flag[0][1]}
     HEREDOC
+   end 
+
+   def end_round(*score_results)
+      puts "=============="
+        puts "Final Score"
+        puts "Dealer had #{score_results[0]}, for a total of: #{score_results[1]}"
+        puts "Player had #{score_results[2]}, for a total of: #{score_results[3]}"
+      puts "=============="
    end 
 
    def bust?(flag)
     flag.include?('BUST!')
    end
+
+   def game_over?(tally)
+      binding.pry
+      dealer, player = tally.partition {|x| x == :Dealer}
+      if dealer.count == 5
+        return :Dealer
+      end
+      if player.count  == 5
+        return :Player
+      end 
+   end 
 
    def welcome_message
       <<-HEREDOC
@@ -87,6 +103,8 @@ require 'pry'
           • King , Queen or Jack cards are all worth 10 points.
           • Aces are worth 1 point if the total of your hand with it is over 21
           • Aces are worth 11 points if the total of your hand with it is less than 21
+        First player to 5 rounds won, wins the entire game
+
       HEREDOC
     end
 
@@ -101,6 +119,8 @@ require 'pry'
       player_hand = []
       dealer_hand = []
       flag = []
+      round = 0
+      tally = []
       # player_total = 0 #local variables can not be accessed outside of block 
       # dealer_total = 0
 
@@ -110,6 +130,17 @@ require 'pry'
         player_hand << DECK.pop
         dealer_hand << DECK.pop
        end 
+
+       if round > 0 
+        ########### Reset Hand 
+        player_hand = []
+        dealer_hand = []
+        2.times do 
+          player_hand << DECK.pop
+          dealer_hand << DECK.pop
+        end 
+       end 
+
        player_total = 0 
        dealer_total = 0
 
@@ -139,19 +170,34 @@ require 'pry'
       
        if bust?(flag)
         puts "Dealer Wins!"
+        tally << :Dealer
+        end_round(dealer_hand, dealer_total, player_hand, player_total)
+        if game_over?(tally)
+          break
+        end 
         sleep(1)
-        answer = play_again
+        answer = play_again?
         if answer == true
-          next 
-        elsif answer == false 
+           round += 1
+           sleep(1) 
+           next
+        elsif answer == false
           break
         end
        end
 
        if win?(player_total)
         puts "Player Wins!"
+        tally << :Player
+        end_round(dealer_hand, dealer_total, player_hand, player_total)
+        if game_over?(tally)
+          break
+        end 
+        sleep(1)
         answer = play_again?
         if answer == true
+          round += 1
+          sleep(1) 
           next 
         elsif answer == false 
           break
@@ -176,9 +222,15 @@ require 'pry'
        
        if bust?(flag)
         puts "Player Wins!"
-        sleep(1)
+        tally << :Player
+        end_round(dealer_hand, dealer_total, player_hand, player_total)
+        if game_over?(tally)
+          break
+        end  
         answer = play_again?
         if answer == true
+          round += 1
+          sleep(1) 
           next 
         elsif answer == false 
           break
@@ -187,14 +239,23 @@ require 'pry'
       
        if win?(dealer_total) 
         puts "Dealer Wins!"
+        tally << :Dealer
+        end_round(dealer_hand, dealer_total, player_hand, player_total)
+        if game_over?(tally)
+          break
+        end 
+        sleep(1)
         answer = play_again?
         if answer == true
+          round += 1
+          sleep(1) 
           next 
         elsif answer == false 
           break
         end
        end 
-
+      
+       #if player and dealer chooses to stay
        flag << compare_hands(player_total, dealer_total)
        puts winning_message(flag)
        break 
