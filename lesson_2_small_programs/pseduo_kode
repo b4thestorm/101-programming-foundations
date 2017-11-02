@@ -1,0 +1,56 @@
+----- Pseudo Code Key 
+START start of the program
+SET sets a variable we can use for later
+GET retrieve input from user
+PRINT displays output to user
+READ  retrieve value from variable
+IF / ELSE IF / ELSE show conditional branches in logic
+WHILE show looping logic
+END end of the program
+
+
+1. a method that returns the sum of two integers
+  PRINT a prompt to get first input from user
+    GET the first input from the user 
+    SET the input from the user to a local variable 
+  PRINT a prompt to get the second input from the user 
+    GET the second input from the user 
+    SET the input from the user to a local variable 
+  ADD the first local variable with the second local variable
+  SET the sum to a local variable
+  RETURN the local variable with the sum from the method
+
+2. a method that takes an array of strings, and returns a string that is all those strings concatenated together
+  PRINT a prompt for a user to type in a single word with no symbols
+    SET the input to a local variable 
+    SPLIT the local variable with an empty space 
+    SET the return value of the SPLIT into a new local variable 
+    SET an empty string local variable
+    SET a iterator variable to 0
+    SET the result of calling LENGTH on the SPLIT local variable to a new local variable
+      USE the LENGTH local variable to START a loop 
+        ADD the first character into the empty local variable 
+        COUNT up 1 
+        ADD the second character into local variable with the new character
+        etc. 
+      END loop 
+      PRINT the local variable out to the screen
+
+3. a method that takes an array of integers, and returns a new array with every other element
+   SET a iterator local variable starting at 0 named COUNT 
+   SET up a new local variable to an empty array named OFFSET
+    START a loop using the length of the original array of integers 
+     IF COUNT modulo 2 has a remainder  
+       use COUNT to enter the array of integers and SET element to empty string APPEND into OFFSET
+      COUNT up 1 NEXT
+     ENDIF
+       use COUNT to enter the array of integers and APPEND integer into OFFSET
+      COUNT up 1 
+       etc. 
+    END loop 
+    PRINT OFFSET to screen
+
+    
+
+
+
